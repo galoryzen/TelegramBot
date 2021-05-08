@@ -33,7 +33,8 @@ def bicho_triste(update, context):
 
 def get_graph(update, context):
     parametros = ' '.join(context.args).strip().split(" ")
-    try:
+
+    try:                #Perform a check to see if parameters are valid
         parametros = [int(parametro) for parametro in parametros]
         for parametro in parametros:
             if parametro < 0:
@@ -56,18 +57,18 @@ def get_graph(update, context):
 def get_fibonacci_sequence(update, context):
     parametros = ' '.join(context.args).strip().split(" ")
 
-    try:
+    try:                #Perform a check to see if parameters are valid
         parametros = [int(parametro) for parametro in parametros]
     except Exception:
         pass
         bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números enteros separados por un espacio, ej: 1 3 4 5")
         return
 
-    arr = functions.fibonacci_sequence(sorted(parametros))
+    sequence = functions.fibonacci_sequence(sorted(parametros)) 
     
-    if len(arr) > 0:
+    if len(sequence) > 0:    #If we found a sequence make the bot return it as a message
         s = ""
-        for number in arr:
+        for number in sequence:
             s += str(number)+" "
         bot.send_message(chat_id = update.effective_chat.id, text = "La subsecuencia encontrada fue "+s)
     else:
@@ -82,7 +83,7 @@ def main():
     updater = Updater(token=TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
-
+    #Add all the handlers
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('bichotriste', bicho_triste))
     dispatcher.add_handler(CommandHandler('balondeoro', balon_de_oro))

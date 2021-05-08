@@ -3,66 +3,63 @@ import matplotlib.pyplot as plt
 from random import randint
 
 def randomList(v, e, k): 
-    arr = [0] * v; 
+    arr = [0] * v;                      #Make an empty array of v elements    
        
     for i in range(2*e):
         while True:
-            j = randint(0, v-1)
-            if arr[j] < min(v-1,k):
+            j = randint(0, v-1)         #Pick a random value j
+            if arr[j] < min(v-1,k):     #Evaluate to see if the array in the j position is incrementable
                 break
             
-        arr[j] += 1; 
-    print(arr)
+        arr[j] += 1
     return arr
 
 
 def generateGraph(v, e, k):
     """
-    k: Grado máximo del vertice
-    e: Cantidad de aristas
     v: Número de vértices
+    e: Cantidad de aristas
+    k: Grado máximo del vertice
     """
-    if e > k*v/2:
-        print("No se puede generar un grafo de estas características")
+    if e > k*v/2:                       #No graph posible with this parameters
         return None
-    elif e > v*(v-1)/2:
-        print(f"No se puede generar un grafo de {v} nodos con más de {v*(v-1)//2} aristas")
+    elif e > v*(v-1)/2:                 #Simple graph can't have more edges than a complete graph
         return None
-    elif e == v*(v-1)/2:
+    elif e == v*(v-1)/2:                #Check if it's the complete graph, so we can return it instantly
         return nx.complete_graph(v)
     else:
-        arr = randomList(v, e, k)
         while True:
-            try:
+            arr = randomList(v, e, k)   #Make a random list of degrees
+            try:                        
                 G = nx.random_degree_sequence_graph(arr)
                 break
-            except Exception:
+            except Exception:           #This catches an exception if the list generated can't be made a simple graph
                pass 
         return G
 
 def fibonacci_sequence(arr: list)-> list:
-    if len(arr) <= 2:
+    if len(arr) <= 2:                   #No possible Fibonacci subsequences of length <= 2
         return []
     
     i = 0
     j = 1
-    new_arr = []
+    sequence = []
 
     while i < len(arr) and j < len(arr):
-        if len(new_arr) == 0:
-            new_arr.append(arr[i])
-            new_arr.append(arr[j])
+        if len(sequence) == 0:          #Add the first 2 numbers into the sequence
+            sequence.append(arr[i])
+            sequence.append(arr[j])
         
         s = arr[i] + arr[j]
-        if s in arr:
-            new_arr.append(s)
+        if s in arr:                    #If the sum is in the array we add it to the sequence and change the iterators
+            sequence.append(s)
             i = j
             j = arr.index(s)
-        else:
-            if len(new_arr) > 2:
+        else:                           #If it isn't in the array we check to see if the sequence is longer than 2, in which case we break
+            if len(sequence) > 2:
                 break
-            else:
-                new_arr = []
+            else:                       #Else we make an empty sequence and increment the iterators
+                sequence = []
                 i += 1
                 j += 1
-    return new_arr
+    return sequence
