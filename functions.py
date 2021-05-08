@@ -37,6 +37,7 @@ def generateGraph(v, e, k):
                pass 
         return G
 
+
 def fibonacci_sequence(arr: list)-> list:
     if len(arr) <= 2:                   #No possible Fibonacci subsequences of length <= 2
         return []
