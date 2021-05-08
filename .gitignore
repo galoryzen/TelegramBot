@@ -1,3 +1,5 @@
 env/
 enviroment/
+__pycache__/
 config.py
+graph.png
