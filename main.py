@@ -16,10 +16,6 @@ def start(update, context):
 def echo(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
 
-def callback_handler(update, context):
-    query = update.callback_query
-    query.answer()
-    data = query.data
 
 def helper(update, context):
     opciones = [
@@ -51,20 +47,6 @@ def menu(update: Update, context):
                                                                  "k:   valor máximo del grado de un vertice\n"+
                                                                  "Recuerde que los parametros deben ser enteros positivos, ej: /grafo 3 3 2")
 
-
-def balon_de_oro(update, context):
-    bot.send_message(
-        chat_id = update.effective_chat.id,
-        text = "Porque soy hermoso, y salto más que Messi, aparezco en los momentos importantes como contra el cagliari, y no en partiditos como el del lyon que no tienen relevancia"
-    )
-
-
-def bicho_triste(update, context):
-    bot.send_message(
-        chat_id = update.effective_chat.id,
-        text = "El éxito ocurre cuando tus sueños son más grandes que tus excusas, si quieres estar feliz recuerda decir SIUUUUUUUUUUUUUUUUUUUUUU"
-    )
-    
 
 def get_graph(update, context):
     parametros = ' '.join(context.args).strip().split(" ")
@@ -120,8 +102,6 @@ def main():
 
     #Add all the handlers
     dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(CommandHandler('bichotriste', bicho_triste))
-    dispatcher.add_handler(CommandHandler('balondeoro', balon_de_oro))
     dispatcher.add_handler(CommandHandler('grafo', get_graph))
     dispatcher.add_handler(CommandHandler('subsecuencia', get_fibonacci_sequence))
 
@@ -132,7 +112,6 @@ def main():
     dispatcher.add_handler(CallbackQueryHandler(menu, pattern="op4"))
 
     dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), echo))
-    dispatcher.add_handler(CallbackQueryHandler(callback_handler))
 
     print(bot.get_me())
     updater.start_polling()
