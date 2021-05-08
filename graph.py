@@ -6,7 +6,6 @@ def randomList(v, e, k):
     arr = [0] * v; 
        
     for i in range(2*e):
-        
         while True:
             j = randint(0, v-1)
             if arr[j] < min(v-1,k):

@@ -38,6 +38,7 @@ def get_graph(update, context):
     if G != None:
         nx.draw(G)
         plt.savefig("graph.png")
+        plt.close()
         bot.send_photo(chat_id=update.effective_chat.id, photo=open("graph.png", 'rb'), caption="Grafo Hecho por el Bichou SIUUUUUUUU")
     else:
         bot.send_message(chat_id = update.effective_chat.id, text = "Ese grafo no se puede hacer mi vale, te crees Teo y no llegas ni a Jarlan")
