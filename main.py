@@ -10,11 +10,17 @@ bot = Bot(token=TOKEN)
 
 def start(update, context):
     name = update.message.chat["first_name"]
-    bot.send_message(chat_id = update.effective_chat.id, text = f"¡Hola, {name} \U0001F44B!, un gusto tenerte por acá. Soy el bicho SIUUUU")
+    bot.send_message(chat_id = update.effective_chat.id, text = f"¡Hola, {name} \U0001F44B!, soy el mejor jugador del mundo, soy el bicho SIUUUU.\n"+
+                                                                "Puedo responder a los siguientes comandos:\n\n"+
+                                                                "/help - Comando de ayuda\n"+
+                                                                "/recurrencia - Calculo de R.R\n"+
+                                                                "/recurrenciavi - Calculo de R.R con v.i\n"+
+                                                                "/grafo - Generaré un grafo dado parámetros v, e, k\n"+
+                                                                "/subsecuencia - Subsecuencia de Fibonacci en una secuencia dada")
 
 
 def echo(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
+    start(update, context)
 
 
 def helper(update, context):
@@ -34,12 +40,13 @@ def menu(update: Update, context):
     answer = query.data
     chat_id = query.message.chat_id
     if answer == "op1":
-        bot.send_message(chat_id = query.message.chat_id, text = "/recurrencia: \nNo implementado todavía")
+        bot.send_message(chat_id = query.message.chat_id, text = "/recurrencia: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /recurrencia c1 c2 c3 ... ck\n"+
+                                                                 "Recuerde ingresar los valores de la secuencia separados por espacios unicamente. \nej: /recurrencia 1 -6 9")
     elif answer == "op2":
         bot.send_message(chat_id = query.message.chat_id, text = "/recurrenciavi: \nNo implementado todavía")
     elif answer == "op3":
         bot.send_message(chat_id = query.message.chat_id, text = "/subsecuencia: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /subsecuencia v1 v2 v3 v4 v5 v6 ... vi\n"+
-                                                                 "Recuerde ingresar los valores de la secuencia separados por espacios unicamente.")
+                                                                 "Recuerde ingresar los valores de la secuencia separados por espacios unicamente. \nej: /subsecuencia 1 4 5 9 10")
     elif answer == "op4":
         bot.send_message(chat_id = query.message.chat_id, text = "/grafo: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /grafo v e k Donde:\n"+
                                                                  "v: # de vertices del grafo\n"+
@@ -58,7 +65,7 @@ def get_graph(update, context):
                 raise ValueError("Número negativo")
     except Exception:
         pass
-        bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números enteros separados por un espacio, ej: 1 3 4 5")
+        bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números enteros mayores o iguales a 0 separados por un espacio, ej: 1 3 4 5.")
         return
     
     G = functions.generateGraph(parametros[0], parametros[1], parametros[2])
@@ -68,17 +75,20 @@ def get_graph(update, context):
         plt.close()
         bot.send_photo(chat_id=update.effective_chat.id, photo=open("graph.png", 'rb'), caption=f"Grafo con {parametros[0]} vertices, {parametros[1]} aristas y máximo grado {parametros[2]}")
     else:
-        bot.send_message(chat_id = update.effective_chat.id, text = "Ese grafo no se puede hacer mi vale, te crees Teo y no llegas ni a Jarlan")
+        bot.send_message(chat_id = update.effective_chat.id, text = "No es posible hacer un grafo con los parametros dados.")
 
     
 def get_fibonacci_sequence(update, context):
     parametros = ' '.join(context.args).strip().split(" ")
 
-    try:                #Perform a check to see if parameters are valid
+    try:                    #Perform a check to see if parameters are valid
         parametros = [int(parametro) for parametro in parametros]
+        for parametro in parametros:
+            if parametro < 0:
+                raise ValueError("Número negativo")
     except Exception:
         pass
-        bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números enteros separados por un espacio, ej: 1 3 4 5")
+        bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números enteros mayores o iguales a 0 separados por un espacio, ej: 1 3 4 5")
         return
 
     sequence = functions.fibonacci_sequence(sorted(parametros)) 
@@ -90,6 +100,19 @@ def get_fibonacci_sequence(update, context):
         bot.send_message(chat_id = update.effective_chat.id, text = "La subsecuencia encontrada fue "+s)
     else:
         bot.send_message(chat_id = update.effective_chat.id, text = "No se encontró ninguna subsecuencia con la secuencia dada")
+
+def solve_recurrence(update, context):
+    parametros = ' '.join(context.args).strip().split(" ")
+
+    try:                    #Perform a check to see if parameters are valid
+        parametros = [float(parametro) for parametro in parametros]
+    except Exception:
+        pass
+        bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números separados por un espacio, ej: 1 3 4 5")
+        return
+
+    solution = functions.recurrencia(parametros)
+    bot.send_message(chat_id = update.effective_chat.id, text = f"La solución encontrada es {solution}")
 
 
 def main():
@@ -104,6 +127,7 @@ def main():
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('grafo', get_graph))
     dispatcher.add_handler(CommandHandler('subsecuencia', get_fibonacci_sequence))
+    dispatcher.add_handler(CommandHandler('recurrencia', solve_recurrence))
 
     dispatcher.add_handler(CommandHandler('help', helper))
     dispatcher.add_handler(CallbackQueryHandler(menu, pattern="op1"))
