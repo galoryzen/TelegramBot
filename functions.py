@@ -3,18 +3,6 @@ import matplotlib.pyplot as plt
 from random import randint
 import numpy as np
 
-def randomList(v, e, k): 
-    arr = [0] * v;                      #Make an empty array of v elements    
-
-    for i in range(2*e):
-        while True:
-            j = randint(0, v-1)         #Pick a random value j
-            if arr[j] < min(v-1,k):     #Evaluate to see if the array in the j position is incrementable
-                break
-            
-        arr[j] += 1
-    return arr
-
 
 def generateGraph(v, e, k):
     """
@@ -28,15 +16,34 @@ def generateGraph(v, e, k):
         return None
     elif e == v*(v-1)/2:                #Check if it's the complete graph, so we can return it instantly
         return nx.complete_graph(v)
-    else:  
+    else:
+        degree_sequence_list = get_all_degree_sequences(v,e,k)
         while True:
-            arr = randomList(v, e, k)   #Make a random list of degrees
+            #Make a random list of degrees
+            degree_sequence = degree_sequence_list[randint(0, len(degree_sequence_list)-1)]
             try:                        
-                G = nx.random_degree_sequence_graph(arr)
+                G = nx.random_degree_sequence_graph(degree_sequence)
                 break
-            except Exception:           #This catches an exception if the list generated can't be made a simple graph
-               pass 
+            except Exception:           #This catches an exception if the degree sequence generated can't be made a simple graph
+                pass 
         return G
+
+
+def get_randrom_degree_sequence(v, e, k):
+    x = np.random.randint(0, min(v-1,k)+1, size=v)
+    while sum(x) != 2*e:
+        x = np.random.randint(0, min(v-1,k)+1, size=v)
+    return x
+
+
+def get_all_degree_sequences(v, e, k):
+    x = []
+    for i in range(40):
+        arr = get_randrom_degree_sequence(v,e,k)
+        if sorted(arr) in x:
+            continue
+        x.append(sorted(arr))
+    return x
 
 
 def fibonacci_sequence(arr: list)-> list:
