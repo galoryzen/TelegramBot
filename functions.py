@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from random import randint
 import numpy as np
 
-
 def generateGraph(v, e, k):
     """
     v: Número de vértices
@@ -84,15 +83,40 @@ def recurrencia(coefficients: list)-> str:
     i = 1
 
     for root, multiplicity in multiplicities.items():
-        s+= "("
         for j in range(multiplicity):
             if j == 0:
-                s+= f"c{i} + "
+                s+= f"c{i}*({root})^n + "
             elif j == 1:
-                s+= f"c{i}*n + "
+                s+= f"c{i}*n*({root})^n + "
             else:
-                s+= f"c{i}*n^{j} + "
+                s+= f"c{i}*n^{j}*({root})^n + "
             i+=1
-        s = s[:-3]
-        s+=f"){root}^n + "
     return s[:-3]
+
+
+def recurrenciavi(coefficients: list, initial_values: list):
+    if len(coefficients) - 1 != len(initial_values):
+        return ""
+    
+    recurrence = recurrencia(coefficients)
+    constants = get_constant_values(recurrence[7:], initial_values)
+    
+    for i in range(len(coefficients)-1):
+        recurrence = recurrence.replace(f"c{(i+1)}", f"({constants[i]:.2f})")
+    return recurrence
+
+
+def get_constant_values(recurrence: str, initial_values: list):
+    terms = recurrence.split(" + ")
+    equation_system = []
+
+    for i in range(len(initial_values)):
+        equation = []
+        n = i
+        for term in terms:
+            k = term.index("*")+1
+            equation.append(eval(term[k:].replace('^', '**')))
+        
+        equation_system.append(equation)
+    
+    return np.linalg.solve(equation_system, initial_values)

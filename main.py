@@ -23,6 +23,10 @@ def echo(update, context):
     start(update, context)
 
 
+def unknown(update, context):
+    bot.send_message(chat_id=update.effective_chat.id, text="Lo siento, no entendí ese comando. Soy el astro portugués pero no creas que leo mentes")
+
+
 def helper(update, context):
     opciones = [
        [InlineKeyboardButton("Recurrencia", callback_data="op1")],
@@ -34,6 +38,7 @@ def helper(update, context):
     name = update.message.chat["first_name"]
     bot.send_message(text=f"Hola {name}, estos son los comandos que puedo ejecutar:", reply_markup=reply_markup, chat_id=update.effective_chat.id)
 
+
 def menu(update: Update, context):
     query = update.callback_query
     query.answer()
@@ -41,9 +46,11 @@ def menu(update: Update, context):
     chat_id = query.message.chat_id
     if answer == "op1":
         bot.send_message(chat_id = query.message.chat_id, text = "/recurrencia: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /recurrencia c1 c2 c3 ... ck\n"+
-                                                                 "Recuerde ingresar los valores de la secuencia separados por espacios unicamente. \nej: /recurrencia 1 -6 9")
+                                                                 "Recuerde ingresar los coeficientes de la secuencia separados por espacios unicamente. \nej: /recurrencia 1 -6 9")
     elif answer == "op2":
-        bot.send_message(chat_id = query.message.chat_id, text = "/recurrenciavi: \nNo implementado todavía")
+        bot.send_message(chat_id = query.message.chat_id, text = "/recurrenciavi: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /recurrenciavi c1 c2 c3 ... ck v1,v2,v3,...,vk\n"+
+                                                                 "Recuerde ingresar los coeficientes de la secuencia separados por espacios unicamente y posteriormente los valores iniciales separados por coma unicamente. \n"+
+                                                                 "ej: /recurrenciavi 1 -6 9 10 2,3,4")
     elif answer == "op3":
         bot.send_message(chat_id = query.message.chat_id, text = "/subsecuencia: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /subsecuencia v1 v2 v3 v4 v5 v6 ... vi\n"+
                                                                  "Recuerde ingresar los valores de la secuencia separados por espacios unicamente. \nej: /subsecuencia 1 4 5 9 10")
@@ -56,7 +63,7 @@ def menu(update: Update, context):
 
 
 def get_graph(update, context):
-    parametros = ' '.join(context.args).strip().split(" ")
+    parametros = context.args
 
     try:                #Perform a check to see if parameters are valid
         parametros = [int(parametro) for parametro in parametros]
@@ -79,7 +86,7 @@ def get_graph(update, context):
 
     
 def get_fibonacci_sequence(update, context):
-    parametros = ' '.join(context.args).strip().split(" ")
+    parametros = context.args
 
     try:                    #Perform a check to see if parameters are valid
         parametros = [int(parametro) for parametro in parametros]
@@ -101,8 +108,9 @@ def get_fibonacci_sequence(update, context):
     else:
         bot.send_message(chat_id = update.effective_chat.id, text = "No se encontró ninguna subsecuencia con la secuencia dada")
 
+
 def solve_recurrence(update, context):
-    parametros = ' '.join(context.args).strip().split(" ")
+    parametros = context.args
 
     try:                    #Perform a check to see if parameters are valid
         parametros = [float(parametro) for parametro in parametros]
@@ -113,6 +121,25 @@ def solve_recurrence(update, context):
 
     solution = functions.recurrencia(parametros)
     bot.send_message(chat_id = update.effective_chat.id, text = f"La solución encontrada es {solution}")
+
+
+def solve_recurrence_with_initial_values(update, context):
+    parametros = context.args
+    valores_iniciales = parametros.pop().split(",")
+    valores_iniciales = [valor_inicial.strip() for valor_inicial in valores_iniciales]
+
+    try:                    #Perform a check to see if parameters are valid
+        parametros = [float(parametro) for parametro in parametros]
+        valores_iniciales = [float(valor_inicial) for valor_inicial in valores_iniciales]
+    except Exception:
+        pass
+        bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben estar escritos de la siguiente manera: 1 -6 9 1,2")
+        return
+    solution = functions.recurrenciavi(parametros, valores_iniciales)
+    if solution != "":
+        bot.send_message(chat_id = update.effective_chat.id, text = f"La solución encontrada es:\n{solution}")
+    else:
+        bot.send_message(chat_id = update.effective_chat.id, text = f"Usted no ha ingresado la cantidad de valores iniciales requeridos. Recuerde que para una recurrencia de grado n, debe ingresar n-1 valores iniciales")
 
 
 def main():
@@ -128,6 +155,7 @@ def main():
     dispatcher.add_handler(CommandHandler('grafo', get_graph))
     dispatcher.add_handler(CommandHandler('subsecuencia', get_fibonacci_sequence))
     dispatcher.add_handler(CommandHandler('recurrencia', solve_recurrence))
+    dispatcher.add_handler(CommandHandler('recurrenciavi', solve_recurrence_with_initial_values))
 
     dispatcher.add_handler(CommandHandler('help', helper))
     dispatcher.add_handler(CallbackQueryHandler(menu, pattern="op1"))
@@ -135,6 +163,7 @@ def main():
     dispatcher.add_handler(CallbackQueryHandler(menu, pattern="op3"))
     dispatcher.add_handler(CallbackQueryHandler(menu, pattern="op4"))
 
+    dispatcher.add_handler(MessageHandler(Filters.command, unknown))
     dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), echo))
 
     print(bot.get_me())
