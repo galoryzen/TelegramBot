@@ -1,5 +1,4 @@
 import networkx as nx
-import matplotlib.pyplot as plt
 from random import randint
 import numpy as np
 
@@ -29,20 +28,20 @@ def generateGraph(v, e, k):
 
 
 def get_randrom_degree_sequence(v, e, k):
-    x = np.random.randint(0, min(v-1,k)+1, size=v)
-    while sum(x) != 2*e:
-        x = np.random.randint(0, min(v-1,k)+1, size=v)
-    return x
+    sequence = np.random.randint(0, min(v-1,k)+1, size=v)
+    while sum(sequence) != 2*e:
+        sequence = np.random.randint(0, min(v-1,k)+1, size=v)
+    return sequence
 
 
 def get_all_degree_sequences(v, e, k):
-    x = []
+    sequences = []
     for i in range(40):
-        arr = get_randrom_degree_sequence(v,e,k)
-        if sorted(arr) in x:
+        sequence = get_randrom_degree_sequence(v,e,k)
+        if sorted(sequence) in sequences:
             continue
-        x.append(sorted(arr))
-    return x
+        sequences.append(sorted(sequence))
+    return sequences
 
 
 def fibonacci_sequence(arr: list)-> list:
@@ -101,7 +100,7 @@ def recurrenciavi(coefficients: list, initial_values: list):
     recurrence = recurrencia(coefficients)
     constants = get_constant_values(recurrence[7:], initial_values)
     
-    for i in range(len(coefficients)-1):
+    for i in range(len(initial_values)):
         recurrence = recurrence.replace(f"c{(i+1)}", f"({constants[i]:.2f})")
     return recurrence
 
