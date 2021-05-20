@@ -58,13 +58,15 @@ def menu(update: Update, context):
         bot.send_message(chat_id = query.message.chat_id, text = "/grafo: \nPara usar este comando, usted deberá utilizarlo de la siguiente manera: /grafo v e k Donde:\n"+
                                                                  "v: # de vertices del grafo\n"+
                                                                  "e: # de aristas del grafo\n"+
-                                                                 "k:   valor máximo del grado de un vertice\n"+
+                                                                 "k:     valor máximo del grado de un vertice\n"+
                                                                  "Recuerde que los parametros deben ser enteros positivos, ej: /grafo 3 3 2")
 
 
 def get_graph(update, context):
     parametros = context.args
-
+    if(len(parametros) != 3):
+        bot.send_message(chat_id = update.effective_chat.id, text = "Recuerde que son 3 parametros: v e k")
+        return
     try:                #Perform a check to see if parameters are valid
         parametros = [int(parametro) for parametro in parametros]
         for parametro in parametros:
@@ -74,7 +76,8 @@ def get_graph(update, context):
         pass
         bot.send_message(chat_id = update.effective_chat.id, text = "Verifique sus parametros, estos deben ser números enteros mayores o iguales a 0 separados por un espacio, ej: 1 3 4 5.")
         return
-    
+
+    bot.send_message(chat_id = update.effective_chat.id, text = "Generando su grafo...")
     G = functions.generateGraph(parametros[0], parametros[1], parametros[2])
     if G != None:
         nx.draw(G)

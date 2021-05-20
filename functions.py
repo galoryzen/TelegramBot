@@ -8,17 +8,16 @@ def generateGraph(v, e, k):
     e: Cantidad de aristas
     k: Grado máximo del vertice
     """
-    if e > k*v/2:                       #No graph posible with this parameters
+    if e > k*v/2:                     #No graph posible with this parameters
         return None
     elif e > v*(v-1)/2:                 #Simple graph can't have more edges than a complete graph
         return None
     elif e == v*(v-1)/2:                #Check if it's the complete graph, so we can return it instantly
         return nx.complete_graph(v)
     else:
-        degree_sequence_list = get_all_degree_sequences(v,e,k)
         while True:
             #Make a random list of degrees
-            degree_sequence = degree_sequence_list[randint(0, len(degree_sequence_list)-1)]
+            degree_sequence = get_randrom_degree_sequence(v,e,k)
             try:                        
                 G = nx.random_degree_sequence_graph(degree_sequence)
                 break
@@ -28,20 +27,18 @@ def generateGraph(v, e, k):
 
 
 def get_randrom_degree_sequence(v, e, k):
-    sequence = np.random.randint(0, min(v-1,k)+1, size=v)
-    while sum(sequence) != 2*e:
-        sequence = np.random.randint(0, min(v-1,k)+1, size=v)
+    sequence = [0]*v
+
+    while sum(sequence)!= 2*e:
+        sequence = [0]*v
+        partial_sum = 0
+        for i in range(v):
+            if partial_sum == 2*e:
+                continue
+            sequence[i] = randint(0, min(v-1,k,e, 2*e-partial_sum))
+            partial_sum += sequence[i]
+    
     return sequence
-
-
-def get_all_degree_sequences(v, e, k):
-    sequences = []
-    for i in range(40):
-        sequence = get_randrom_degree_sequence(v,e,k)
-        if sorted(sequence) in sequences:
-            continue
-        sequences.append(sorted(sequence))
-    return sequences
 
 
 def fibonacci_sequence(arr: list)-> list:
